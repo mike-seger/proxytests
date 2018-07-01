@@ -25,3 +25,10 @@ https://github.com/pottava/basicauth-reverseproxy
 curl -u "user1:pass1" -x http://localhost:17780/  http://www.google.com
 ```
 
+## References:
+https://blog.typodrive.com/2016/08/18/simple-squid-on-docker-setup/
+https://github.com/sameersbn/docker-squid
+https://wiki.squid-cache.org/Features/Authentication
+https://medium.com/@salmaan.rashid/multi-mode-squid-proxy-container-running-ssl-bump-622128b8482a
+https://docs.oracle.com/javase/9/docs/api/java/net/doc-files/net-properties.html#Proxies
+https://stackoverflow.com/questions/41505219/unable-to-tunnel-through-proxy-proxy-returns-http-1-1-407-via-https
