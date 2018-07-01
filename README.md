@@ -10,6 +10,11 @@ export https_proxy=http://user1:pass1@127.0.0.1:3128
 ```
 curl http://www.google.com
 curl https://www.google.com
+java -Djdk.http.auth.tunneling.disabledSchemes= \
+	-Djdk.http.auth.proxying.disabledSchemes= \
+	-Dhttpproxy="http://user1:pass1@localhost:3128" \
+	-Dhttpsproxy="http://user1:pass1@localhost:3128" \
+	TestProxy "-"  "http://www.google.com"
 ```
 
 ## basicauth-reverseproxy
