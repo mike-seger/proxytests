@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  squid:
+    #image: jpvriel/squid
+    image: sameersbn/squid:latest
+    ports:
+      - "3128:3128"
+    volumes:
+      - ./squid.conf:/etc/squid3/squid.conf
+      - ./squid_passwd:/etc/squid3/squid_passwd
+    #  - /srv/docker/squid/cache:/var/spool/squid3
+    restart: always
+  #squid-no-cache:
+  #  image: minimum2scp/squid
+  #  ports:
+  #    - "3128:3128"
+  proxy:
+    image: pottava/proxy
+    ports:
+      - 17780:80
+    environment:
+      - PROXY_URL=http://google.com/
+      - BASIC_AUTH_USER=user1
+      - BASIC_AUTH_PASS=pass1
+      - ACCESS_LOG=true
+    container_name: pottava-proxy
