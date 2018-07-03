@@ -4,7 +4,6 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -33,8 +32,7 @@ public class RestProxyTemplate {
 
     @PostConstruct
     public void init() throws Exception {
-        parseUri(proxyHttp);
-    //    this.restTemplate=createRestTemplate();
+        parseUri(proxyHttp);;
         this.restTemplate = new RestTemplate();
 
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -51,29 +49,6 @@ public class RestProxyTemplate {
         factory.setHttpClient(client);
 
         restTemplate.setRequestFactory(factory);
-    }
-
-    private RestTemplate createRestTemplate() throws Exception {
-        final String username = proxyUser;
-        final String password = proxyPassword;
-        final String proxyUrl = proxyHost;
-        final int port = proxyPort;
-
-        CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(
-                new AuthScope(proxyUrl, port),
-                new UsernamePasswordCredentials(username, password));
-
-        HttpHost myProxy = new HttpHost(proxyUrl, port);
-        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-
-        clientBuilder.setProxy(myProxy).setDefaultCredentialsProvider(credsProvider).disableCookieManagement();
-
-        HttpClient httpClient = clientBuilder.build();
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setHttpClient(httpClient);
-
-        return new RestTemplate(factory);
     }
 
     private void parseUri(String uriString) throws URISyntaxException {
