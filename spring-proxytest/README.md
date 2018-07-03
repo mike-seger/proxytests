@@ -2,7 +2,7 @@
 
 ## Run the example server application
 ```
-$ mvn clean packag
+$ mvn clean package
 $ java -jar target/myapplication-0.0.1-SNAPSHOT.jar
 # or
 $ mvn spring-boot:run
