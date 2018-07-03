@@ -15,6 +15,10 @@ services:
   #  image: minimum2scp/squid
   #  ports:
   #    - "3128:3128"
+  httpbin:
+    image: kennethreitz/httpbin
+    ports:
+      - 8090:80
   proxy:
     image: pottava/proxy
     ports:
