@@ -48,13 +48,13 @@ public class RestProxyTemplate {
         clientBuilder.setDefaultCredentialsProvider(credsProvider);
         clientBuilder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
 
-        // disable SSL trust
-        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-                .loadTrustMaterial(null, acceptingTrustStrategy)
-                .build();
-        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-        clientBuilder.setSSLSocketFactory(csf);
+        // trust all SSL
+//        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+//        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+//                .loadTrustMaterial(null, acceptingTrustStrategy)
+//                .build();
+//        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+//        clientBuilder.setSSLSocketFactory(csf);
 
         CloseableHttpClient client = clientBuilder.build();
 
