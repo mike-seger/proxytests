@@ -17,8 +17,15 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 
 @Component
@@ -63,6 +70,32 @@ public class RestProxyTemplate {
 
         restTemplate.setRequestFactory(factory);
     }
+
+//    private void registerKeyStore(String keyStoreName) {
+//        try {
+//            ClassLoader classLoader = this.getClass().getClassLoader();
+//            InputStream keyStoreInputStream = classLoader.getResourceAsStream(keyStoreName);
+//            if (keyStoreInputStream == null) {
+//                throw new FileNotFoundException("Could not find file named '" + keyStoreName + "' in the CLASSPATH");
+//            }
+//
+//            //load the keystore
+//            KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+//            keystore.load(keyStoreInputStream, null);
+//
+//            //add to known keystore
+//            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+//            trustManagerFactory.init(keystore);
+//
+//            //default SSL connections are initialized with the keystore above
+//            TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+//            SSLContext sc = SSLContext.getInstance("SSL");
+//            sc.init(null, trustManagers, null);
+//            SSLContext.setDefault(sc);
+//        } catch (IOException | GeneralSecurityException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     private void parseUri(String uriString) throws URISyntaxException {
         URI uri=new URI(uriString);
