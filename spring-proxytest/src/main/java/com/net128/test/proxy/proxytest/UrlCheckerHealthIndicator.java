@@ -56,7 +56,7 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
                 }
                 return ok;
             } catch(Exception e) {
-                checkedUrl.error=e.getMessage().toString();
+                checkedUrl.error=e.getMessage();
                 checkedUrl.status=Status.DOWN.toString();
                 e.printStackTrace();
                 return 0;
@@ -67,10 +67,11 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
+        Health.Builder hb=Health.up();
         if (!checkAll()) {
-            return Health.down().withDetail("checks", checkedUrls).build();
+            hb = Health.down();
         }
-        return Health.up().build();
+        return hb.withDetail("checks", checkedUrls).build();
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -78,20 +79,8 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
         private UrlCheckerConfig.Check check;
         private RestTemplate restTemplate;
         private int httpStatus;
-        private String status = Status.UP.toString();
-        private String url;
-        private String error;
-
-        public String getUrl() {
-            return url;
-        }
-
-        public String getError() {
-            return error;
-        }
-
-        public String getStatus() {
-            return status;
-        }
+        public String status = Status.UP.toString();
+        public String url;
+        public String error;
     }
 }
