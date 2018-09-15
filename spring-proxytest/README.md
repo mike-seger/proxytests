@@ -13,6 +13,9 @@ $ mvn spring-boot:run
 unset http_proxy
 unset https_proxy
 
+# call health check (incl. url checker)
+curl -s localhost:8080/actuator/health | jq .
+
 # GET
 curl -X GET -v "http://localhost:8080/proxy?url=https://httpbin.org/anything&data=1234"
 # POST
