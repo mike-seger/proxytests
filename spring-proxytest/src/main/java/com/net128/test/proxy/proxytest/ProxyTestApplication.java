@@ -1,4 +1,4 @@
-package com.net128.test.proxy.ProxyTest;
+package com.net128.test.proxy.proxytest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

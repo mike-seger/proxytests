@@ -10,6 +10,9 @@ $ mvn spring-boot:run
 
 ## Test using curl
 ```
+unset http_proxy
+unset https_proxy
+
 # GET
 curl -X GET -v "http://localhost:8080/proxy?url=https://httpbin.org/anything&data=1234"
 # POST

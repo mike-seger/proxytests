@@ -3,18 +3,13 @@ version: '3'
 services:
   squid:
     #image: jpvriel/squid
-    image: sameersbn/squid:latest
+    image: sameersbn/squid:3.5.27
     ports:
       - "3128:3128"
     volumes:
-      - ./squid.conf:/etc/squid3/squid.conf
-      - ./squid_passwd:/etc/squid3/squid_passwd
-    #  - /srv/docker/squid/cache:/var/spool/squid3
+      - ./squid.conf:/etc/squid/squid.conf
+      - ./squid_passwd:/etc/squid/squid_passwd
     restart: always
-  #squid-no-cache:
-  #  image: minimum2scp/squid
-  #  ports:
-  #    - "3128:3128"
   httpbin:
     image: kennethreitz/httpbin
     ports:

@@ -1,34 +1,19 @@
-package com.net128.test.proxy.ProxyTest;
+package com.net128.test.proxy.proxytest;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.ProxyAuthenticationStrategy;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.cert.X509Certificate;
 
-@Component
 public class RestProxyTemplate {
 
     private RestTemplate restTemplate;
@@ -38,17 +23,25 @@ public class RestProxyTemplate {
     private String proxyUser;
     private String proxyPassword;
 
-    @Value("${proxy.http}")
-    private String proxyHttp;
+    public RestProxyTemplate() {
+        restTemplate = new RestTemplate();
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        restTemplate.setRequestFactory(factory);
+    }
+    public RestProxyTemplate(String proxyUrl) {
+        this();
+        init(proxyUrl);
+    }
 
-    @PostConstruct
-    public void init() throws Exception {
-        parseUri(proxyHttp);;
-        this.restTemplate = new RestTemplate();
-
+    public void init(String proxyUrl) {
+        if(proxyUrl == null) {
+            return;
+        }
+        parseUri(proxyUrl);
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(new AuthScope(proxyHost, proxyPort), new UsernamePasswordCredentials(proxyUser, proxyPassword));
-
+        credsProvider.setCredentials(
+            new AuthScope(proxyHost, proxyPort),
+            new UsernamePasswordCredentials(proxyUser, proxyPassword));
         HttpClientBuilder clientBuilder = HttpClientBuilder.create();
         clientBuilder.useSystemProperties();
         clientBuilder.setProxy(new HttpHost(proxyHost, proxyPort));
@@ -65,10 +58,10 @@ public class RestProxyTemplate {
 
         CloseableHttpClient client = clientBuilder.build();
 
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setHttpClient(client);
-
-        restTemplate.setRequestFactory(factory);
+        HttpComponentsClientHttpRequestFactory rf =
+                (HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory();
+        rf.setHttpClient(client);
+        restTemplate.setRequestFactory(rf);
     }
 
 //    private void registerKeyStore(String keyStoreName) {
@@ -97,8 +90,13 @@ public class RestProxyTemplate {
 //        }
 //    }
 
-    private void parseUri(String uriString) throws URISyntaxException {
-        URI uri=new URI(uriString);
+    private void parseUri(String uriString) {
+        URI uri= null;
+        try {
+            uri = new URI(uriString);
+        } catch (URISyntaxException e) {
+           throw new RuntimeException("Unable to parse: "+uriString, e);
+        }
         String authority = uri.getAuthority();
         if (authority != null) {
             int pos = authority.lastIndexOf("@");
