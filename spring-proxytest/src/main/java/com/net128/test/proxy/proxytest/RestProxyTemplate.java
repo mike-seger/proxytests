@@ -4,6 +4,8 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -11,29 +13,39 @@ import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+import javax.net.ssl.SSLContext;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
-public class RestProxyTemplate {
-
-    private RestTemplate restTemplate;
-
+public class RestProxyTemplate extends RestTemplate {
     private String proxyHost;
     private int proxyPort;
     private String proxyUser;
     private String proxyPassword;
+    private boolean trustAllSsl;
 
     public RestProxyTemplate() {
-        restTemplate = new RestTemplate();
+        super();
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        restTemplate.setRequestFactory(factory);
+        setRequestFactory(factory);
     }
-    public RestProxyTemplate(String proxyUrl) {
+    public RestProxyTemplate(boolean trustAllSsl) {
         this();
-        init(proxyUrl);
+        this.trustAllSsl=trustAllSsl;
+    }
+    public RestProxyTemplate(String proxyUrl, boolean trustAllSsl) {
+        this(trustAllSsl);
+        try {
+            init(proxyUrl);
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred initializing", e);
+        }
     }
 
-    public void init(String proxyUrl) {
+    private void init(String proxyUrl) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         if(proxyUrl == null) {
             return;
         }
@@ -48,21 +60,37 @@ public class RestProxyTemplate {
         clientBuilder.setDefaultCredentialsProvider(credsProvider);
         clientBuilder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
 
-        // trust all SSL
-//        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-//        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-//                .loadTrustMaterial(null, acceptingTrustStrategy)
-//                .build();
-//        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-//        clientBuilder.setSSLSocketFactory(csf);
-
+        if(trustAllSsl) {
+            SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+                .loadTrustMaterial(null, (certificate, authType) -> true)
+                .build();
+            SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+            clientBuilder.setSSLSocketFactory(csf);
+            clientBuilder.setSSLHostnameVerifier(new NoopHostnameVerifier());
+        }
         CloseableHttpClient client = clientBuilder.build();
 
         HttpComponentsClientHttpRequestFactory rf =
-                (HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory();
+                (HttpComponentsClientHttpRequestFactory) getRequestFactory();
         rf.setHttpClient(client);
-        restTemplate.setRequestFactory(rf);
+        setRequestFactory(rf);
     }
+
+    //TODO paramterrize key and trust stores
+
+//    SSLContext sslContext = SSLContextBuilder
+//            .create()
+//            .loadKeyMaterial(ResourceUtils.getFile("classpath:keystore.jks"), allPassword.toCharArray(), allPassword.toCharArray())
+//            .loadTrustMaterial(ResourceUtils.getFile("classpath:truststore.jks"), allPassword.toCharArray())
+//            .build();
+//
+//    HttpClient client = HttpClients.custom()
+//            .setSSLContext(sslContext)
+//            .build();
+//
+//        return builder
+//                .requestFactory(new HttpComponentsClientHttpRequestFactory(client))
+//            .build();
 
 //    private void registerKeyStore(String keyStoreName) {
 //        try {
@@ -91,7 +119,7 @@ public class RestProxyTemplate {
 //    }
 
     private void parseUri(String uriString) {
-        URI uri= null;
+        URI uri;
         try {
             uri = new URI(uriString);
         } catch (URISyntaxException e) {
@@ -113,9 +141,5 @@ public class RestProxyTemplate {
 
         proxyHost = uri.getHost();
         proxyPort = uri.getPort();
-    }
-
-    public RestTemplate getRestTemplate() {
-        return restTemplate;
     }
 }

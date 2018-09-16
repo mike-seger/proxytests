@@ -17,7 +17,7 @@ public class ProxyController {
 
     @PostConstruct
     public void init() {
-        restTemplate = new RestProxyTemplate(proxyHttp).getRestTemplate();
+        restTemplate = new RestProxyTemplate(proxyHttp, true);
     }
 
     @ResponseBody

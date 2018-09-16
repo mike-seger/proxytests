@@ -32,7 +32,8 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
         if(urlCheckerConfig.getChecks()!=null) {
             for(UrlCheckerConfig.Check check : urlCheckerConfig.getChecks()) {
                 CheckedUrl checkedUrl=new CheckedUrl();
-                checkedUrl.restTemplate=new RestProxyTemplate(check.getProxyUrl()).getRestTemplate();
+                checkedUrl.restTemplate=new RestProxyTemplate(
+                    check.getProxyUrl(), check.trustAllSsl);
                 checkedUrl.check=check;
                 checkedUrl.url=check.getUrl();
                 HttpComponentsClientHttpRequestFactory rf =
@@ -102,6 +103,8 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
             private int okStatus;
             @JsonIgnore
             private int timeoutSeconds;
+            @JsonIgnore
+            private boolean trustAllSsl;
 
             public String getUrl() {
                 return url;
@@ -143,13 +146,23 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
                 this.timeoutSeconds = timeoutSeconds;
             }
 
+            public boolean isTrustAllSsl() {
+                return trustAllSsl;
+            }
+
+            public void setTrustAllSsl(boolean trustAllSsl) {
+                this.trustAllSsl = trustAllSsl;
+            }
+
             @Override
             public String toString() {
                 return "Check{" +
                         "url='" + url + '\'' +
                         ", proxyUrl='" + proxyUrl + '\'' +
-                        ", method='" + method + '\'' +
+                        ", method=" + method +
                         ", okStatus=" + okStatus +
+                        ", timeoutSeconds=" + timeoutSeconds +
+                        ", trustAllSsl=" + trustAllSsl +
                         '}';
             }
         }
