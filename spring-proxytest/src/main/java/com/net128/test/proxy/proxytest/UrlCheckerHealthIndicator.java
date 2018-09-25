@@ -41,9 +41,9 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
                 checkedUrl.url=check.getUrl();
                 HttpComponentsClientHttpRequestFactory rf =
                     (HttpComponentsClientHttpRequestFactory) checkedUrl.restTemplate.getRequestFactory();
-                rf.setConnectionRequestTimeout(check.getTimeoutSeconds() * 1000);
-                rf.setReadTimeout(check.getTimeoutSeconds() * 1000);
-                rf.setConnectTimeout(check.getTimeoutSeconds() * 1000);
+                rf.setConnectionRequestTimeout((int)Math.round(check.getTimeoutSeconds() * 1000.0));
+                rf.setReadTimeout((int)Math.round(check.getTimeoutSeconds() * 1000.0));
+                rf.setConnectTimeout((int)Math.round(check.getTimeoutSeconds() * 1000.0));
                 checkedUrls.add(checkedUrl);
             }
         }
@@ -105,7 +105,7 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
             private HttpMethod method;
             private int okStatus;
             @JsonIgnore
-            private int timeoutSeconds;
+            private double timeoutSeconds;
             @JsonIgnore
             private boolean trustAllSsl;
 
@@ -143,11 +143,11 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
                 this.okStatus = okStatus;
             }
 
-            public int getTimeoutSeconds() {
+            public double getTimeoutSeconds() {
                 return timeoutSeconds;
             }
 
-            public void setTimeoutSeconds(int timeoutSeconds) {
+            public void setTimeoutSeconds(double timeoutSeconds) {
                 this.timeoutSeconds = timeoutSeconds;
             }
 
