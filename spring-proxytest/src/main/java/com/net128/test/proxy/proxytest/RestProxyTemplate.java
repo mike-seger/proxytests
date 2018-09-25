@@ -46,19 +46,18 @@ public class RestProxyTemplate extends RestTemplate {
     }
 
     private void init(String proxyUrl) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-        if(proxyUrl == null) {
-            return;
-        }
-        parseUri(proxyUrl);
-        CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(
-            new AuthScope(proxyHost, proxyPort),
-            new UsernamePasswordCredentials(proxyUser, proxyPassword));
         HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-        clientBuilder.useSystemProperties();
-        clientBuilder.setProxy(new HttpHost(proxyHost, proxyPort));
-        clientBuilder.setDefaultCredentialsProvider(credsProvider);
-        clientBuilder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
+        if(proxyUrl != null) {
+            parseUri(proxyUrl);
+            CredentialsProvider credsProvider = new BasicCredentialsProvider();
+            credsProvider.setCredentials(
+                    new AuthScope(proxyHost, proxyPort),
+                    new UsernamePasswordCredentials(proxyUser, proxyPassword));
+            clientBuilder.useSystemProperties();
+            clientBuilder.setProxy(new HttpHost(proxyHost, proxyPort));
+            clientBuilder.setDefaultCredentialsProvider(credsProvider);
+            clientBuilder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
+        }
 
         if(trustAllSsl) {
             SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()

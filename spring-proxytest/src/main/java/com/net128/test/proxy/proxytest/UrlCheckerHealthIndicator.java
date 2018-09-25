@@ -31,6 +31,9 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
     public void init() {
         if(urlCheckerConfig.getChecks()!=null) {
             for(UrlCheckerConfig.Check check : urlCheckerConfig.getChecks()) {
+                if(check.disabled) {
+                    continue;
+                }
                 CheckedUrl checkedUrl=new CheckedUrl();
                 checkedUrl.restTemplate=new RestProxyTemplate(
                     check.getProxyUrl(), check.trustAllSsl);
@@ -106,6 +109,8 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
             @JsonIgnore
             private boolean trustAllSsl;
 
+            private boolean disabled;
+
             public String getUrl() {
                 return url;
             }
@@ -154,6 +159,14 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
                 this.trustAllSsl = trustAllSsl;
             }
 
+            public boolean isDisabled() {
+                return disabled;
+            }
+
+            public void setDisabled(boolean disabled) {
+                this.disabled = disabled;
+            }
+
             @Override
             public String toString() {
                 return "Check{" +
@@ -163,6 +176,7 @@ public class UrlCheckerHealthIndicator implements HealthIndicator {
                         ", okStatus=" + okStatus +
                         ", timeoutSeconds=" + timeoutSeconds +
                         ", trustAllSsl=" + trustAllSsl +
+                        ", disabled=" + disabled +
                         '}';
             }
         }
