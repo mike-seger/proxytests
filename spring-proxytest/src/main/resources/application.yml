@@ -1,0 +1,23 @@
+management:
+    endpoint:
+        health:
+            show-details: always
+monitor:
+    urlchecker:
+        checks:
+        -   method: GET
+            ok-status: 200
+            proxy-url: http://user1:pass1@127.0.0.1:3128
+            timeout-seconds: 2
+            url: http://www.google.com
+        -   method: GET
+            ok-status: 200
+            proxy-url: http://user1:pass1@127.0.0.1:3128
+            timeout-seconds: 2
+            url: http://www.switch.ch/
+        -   method: GET
+            ok-status: 200
+            timeout-seconds: 2
+            url: http://www.switch.ch/
+proxy:
+    http: http://user1:pass1@localhost:3128
